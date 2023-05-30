@@ -1,0 +1,270 @@
+service: api-bank
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  environment:
+    keymysql: ${env:keymysql}
+    database: ${env:database}
+    host: ${env:host}
+    user: ${env:user}
+  layers:
+    - Ref: PythonRequirementsLambdaLayer
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - cognito-idp:AdminSetUserPassword
+        - cognito-idp:AdminUpdateUserAttributes
+        - cognito-idp:GetUser
+        - s3:PutObject
+      Resource: "*"
+
+custom:
+  pythonRequirements:
+    fileName: requirements.txt
+    layer: true
+    slim: true
+    strip: false
+    slimPatternsAppendDefaults: false
+    slimPatterns:
+      - boto3/**
+      - botocore/**
+      - s3transfer/**
+      - urllib3/**
+      - mysql/vendor/**
+      - '*/.py[c|o]'
+      - '*/_pycache_'
+
+package:
+  patterns:
+    - '!.env'
+    - '!.gitignore'
+    - '!README.md'
+    - 'requirements.txt'
+  exclude:
+    - 'node_modules/**'
+    - '!package-lock.json'
+    - 'venv/**'
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /
+          method: get
+
+  create_user:
+    handler: fun_handlers/handlerss.create_user
+    events:
+      - http:
+          path: /create_user
+          method: post
+
+  get_users:
+      handler: fun_handlers/handlerss.get_users
+      events:
+        - http:
+            path: /users
+            method: get
+
+  update_user:
+      handler: fun_handlers/handlerss.update_user
+      events:
+        - http:
+            path: /update_user
+            method: put
+            authorizer:
+              type: COGNITO_USER_POOLS
+              authorizerId:
+                9rkyqd
+
+  auth_user:
+    handler: fun_handlers/handlerss.auth_user
+    events:
+      - http:
+          path: /auth_user
+          method: post
+
+  login:
+    handler: fun_handlers/handlerss.login
+    events:
+      - http:
+          path: /login
+          method: post
+
+  assign_permissions:
+      handler: fun_handlers/handlerss.assign_permissions
+      events:
+        - http:
+            path: /assign_permissions
+            method: post
+
+  get_permissions:
+      handler: fun_handlers/handlerss.get_permissions
+      events:
+        - http:
+            path: /get_permissions
+            method: get
+
+  create_customer:
+    handler: fun_handlers/handlerss.create_customer
+    events:
+      - http:
+          path: /create_customer
+          method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  update_customer:
+    handler: fun_handlers/handlerss.update_customer
+    events:
+      - http:
+          path: /update_customer
+          method: put
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  get_customers:
+      handler: fun_handlers/handlerss.get_customers
+      events:
+        - http:
+            path: /customers
+            method: get
+            authorizer:
+              type: COGNITO_USER_POOLS
+              authorizerId:
+                9rkyqd
+
+  delete_customer:
+    handler: fun_handlers/handlerss.delete_customer
+    events:
+      - http:
+          path: /delete_customer
+          method: delete
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  create_savings_account:
+    handler: fun_handlers/handlerss.create_savings_account
+    events:
+      - http:
+          path: /create_savings_account
+          method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  get_savings_account:
+    handler: fun_handlers/handlerss.get_savings_account
+    events:
+      - http:
+          path: /get_savings_account
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  update_savings_account:
+    handler: fun_handlers/handlerss.update_savings_account
+    events:
+      - http:
+          path: /update_savings_account
+          method: put
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  # delete_savings_account:
+  #   handler: fun_handlers/handlerss.delete_savings_account
+  #   events:
+  #     - http:
+  #         path: /delete_savings_account
+  #         method: delete
+  #         authorizer:
+  #           type: COGNITO_USER_POOLS
+  #           authorizerId:
+  #             9rkyqd
+
+  create_transaction:
+    handler: fun_handlers/handlerss.create_transaction
+    events:
+      - http:
+          path: /create_transaction
+          method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  get_transaction:
+    handler: fun_handlers/handlerss.get_transaction
+    events:
+      - http:
+          path: /get_transaction
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  credits:
+    handler: fun_handlers/handlerss.create_credits
+    events:
+      - http:
+          path: /create_credits
+          method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  get_credit:
+    handler: fun_handlers/handlerss.get_credit
+    events:
+      - http:
+          path: /credit
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  installments:
+    handler: fun_handlers/handlerss.create_installments
+    events:
+      - http:
+          path: /create_installments
+          method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
+
+  get_installments:
+    handler: fun_handlers/handlerss.get_installments
+    events:
+      - http:
+          path: /get_installments
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              9rkyqd
